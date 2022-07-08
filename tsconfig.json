@@ -15,6 +15,9 @@
         "isolatedModules": true,
         "incremental": true
     },
+    "types": [
+        "jest"
+    ],
     "include": [
         "**/*.ts"
     ],

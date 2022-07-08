@@ -12,10 +12,10 @@ export enum TokenType {
     L_Brace = "{",
     R_Brace = "}",
     Function = "function",
-    Var = "Var"
+    Var = "var"
 }
 
-class Token {
+export class Token {
     constructor(
         public type: TokenType,
         public literal: string,
