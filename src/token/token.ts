@@ -5,14 +5,20 @@ export enum TokenType {
     Int = "int",
     Assign = "=",
     Plus = "+",
+    Minus = "-",
+    Slash = "/",
+    BANG = "!",
+    Asterisk = "*",
+    LessThan = "<",
+    GreaterThan = ">",
     Comma = ",",
     Semicolon = ";",
     L_Paren = "(",
     R_Paren = ")",
     L_Brace = "{",
     R_Brace = "}",
-    Function = "function",
-    Var = "var"
+    Function = "fn",
+    Let = "let"
 }
 
 export class Token {
