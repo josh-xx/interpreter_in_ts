@@ -1,23 +1,22 @@
 {
-  "name": "interpreter",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "jest"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@babel/core": "^7.18.6",
-    "@babel/preset-env": "^7.18.6",
-    "@babel/preset-typescript": "^7.18.6",
-    "@types/jest": "^28.1.4",
-    "babel-jest": "^28.1.2",
-    "jest": "^28.1.2",
-    "ts-jest": "^28.0.5",
-    "ts-node": "^10.8.2",
-    "typescript": "^4.7.4"
-  }
+    "name": "untitled",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest",
+        "dev": "node -r @swc-node/register ./src/run.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@swc-node/register": "1.5.1",
+        "@swc/core": "1.2.210",
+        "@swc/jest": "0.2.21",
+        "jest": "28.1.2",
+        "typescript": "4.7.4",
+        "@swc-node/jest": "1.5.2",
+        "@types/jest": "28.1.4"
+    }
 }

@@ -1,8 +1,6 @@
 import {Lexer} from "../lexer";
 import {Token, TokenType} from "../token";
 
-export {}
-
 describe("test lexer", () => {
     it('tokens1', () => {
         let l = new Lexer('=+(){},;-/*<>!')
@@ -35,7 +33,7 @@ describe("test lexer", () => {
         }
         if (token.type === TokenType.EOF) i++
 
-        expect(i).toBe(result.length)
+        expect(i).toEqual(result.length)
     })
 
     it('tokens2', () => {
