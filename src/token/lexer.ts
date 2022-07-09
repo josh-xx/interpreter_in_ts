@@ -46,6 +46,8 @@ export class Lexer {
             return new Token(TokenType.Function, word)
         } else if (word === 'let') {
             return new Token(TokenType.Let, word)
+        } else if (word === 'return') {
+            return new Token(TokenType.Return, word)
         } else {
             return new Token(TokenType.Identifier, word)
         }
@@ -101,7 +103,7 @@ export class Lexer {
         } else if (c === '>') {
             token = new Token(TokenType.GreaterThan, c)
         } else if (c === '!') {
-            token = new Token(TokenType.BANG, c)
+            token = new Token(TokenType.Bang, c)
         } else {
             if (this.isAlphabet(c)) {
                 return this.readWord()

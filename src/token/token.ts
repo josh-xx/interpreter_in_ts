@@ -7,7 +7,7 @@ export enum TokenType {
     Plus = "+",
     Minus = "-",
     Slash = "/",
-    BANG = "!",
+    Bang = "!",
     Asterisk = "*",
     LessThan = "<",
     GreaterThan = ">",
@@ -18,7 +18,8 @@ export enum TokenType {
     L_Brace = "{",
     R_Brace = "}",
     Function = "fn",
-    Let = "let"
+    Let = "let",
+    Return = "return"
 }
 
 export class Token {

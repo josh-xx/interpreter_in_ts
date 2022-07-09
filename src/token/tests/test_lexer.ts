@@ -18,7 +18,7 @@ describe("test lexer", () => {
             new Token(TokenType.Asterisk, '*'),
             new Token(TokenType.LessThan, '<'),
             new Token(TokenType.GreaterThan, '>'),
-            new Token(TokenType.BANG, '!'),
+            new Token(TokenType.Bang, '!'),
             new Token(TokenType.EOF, ''),
         ]
 
