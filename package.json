@@ -5,7 +5,9 @@
     "main": "index.js",
     "scripts": {
         "test": "jest",
-        "dev": "node -r @swc-node/register ./src/run.ts"
+        "watch": "jest --watch",
+        "dev": "node -r @swc-node/register ./src/run.ts",
+        "bun-dev": "bun ./src/run.ts"
     },
     "keywords": [],
     "author": "",

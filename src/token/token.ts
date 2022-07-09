@@ -7,7 +7,7 @@ export enum TokenType {
     Plus = "+",
     Minus = "-",
     Slash = "/",
-    BANG = "!",
+    Bang = "!",
     Asterisk = "*",
     LessThan = "<",
     GreaterThan = ">",
@@ -18,7 +18,14 @@ export enum TokenType {
     L_Brace = "{",
     R_Brace = "}",
     Function = "fn",
-    Let = "let"
+    Let = "let",
+    True = 'true',
+    False = 'false',
+    If = 'if',
+    Else = 'else',
+    Return = 'return',
+    Eq = '==',
+    Not_Eq = '!=',
 }
 
 export class Token {
@@ -26,16 +33,4 @@ export class Token {
         public type: TokenType,
         public literal: string,
     ) {}
-}
-
-class TokenList {
-    constructor(
-        public tokens: Token[] = [],
-        public current: number = -1,
-    ) {}
-
-    nextToken() {
-        this.current += 1
-        return this.tokens[this.current]
-    }
 }
