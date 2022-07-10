@@ -43,6 +43,17 @@ let ten = 10;
      x + y;
 };
    let result = add(five, ten);
+   !-/*5;
+5 < 10 > 5;
+if (5 < 10) {
+return true;
+} else {
+return false;
+}
+
+10 == 10;
+10 != 9;
+   
    `
         let l = new Lexer(input)
         let result: Token[] = [
@@ -81,6 +92,43 @@ let ten = 10;
             new Token(TokenType.Comma, ','),
             new Token(TokenType.Identifier, 'ten'),
             new Token(TokenType.R_Paren, ')'),
+            new Token(TokenType.Semicolon, ';'),
+            new Token(TokenType.Bang, '!'),
+            new Token(TokenType.Minus, '-'),
+            new Token(TokenType.Slash, '/'),
+            new Token(TokenType.Asterisk, '*'),
+            new Token(TokenType.Int, '5'),
+            new Token(TokenType.Semicolon, ';'),
+            new Token(TokenType.Int, '5'),
+            new Token(TokenType.LessThan, '<'),
+            new Token(TokenType.Int, '10'),
+            new Token(TokenType.GreaterThan, '>'),
+            new Token(TokenType.Int, '5'),
+            new Token(TokenType.Semicolon, ';'),
+            new Token(TokenType.If, 'if'),
+            new Token(TokenType.L_Paren, '('),
+            new Token(TokenType.Int, '5'),
+            new Token(TokenType.LessThan, '<'),
+            new Token(TokenType.Int, '10'),
+            new Token(TokenType.R_Paren, ')'),
+            new Token(TokenType.L_Brace, '{'),
+            new Token(TokenType.Return, 'return'),
+            new Token(TokenType.True, 'true'),
+            new Token(TokenType.Semicolon, ';'),
+            new Token(TokenType.R_Brace, '}'),
+            new Token(TokenType.Else, 'else'),
+            new Token(TokenType.L_Brace, '{'),
+            new Token(TokenType.Return, 'return'),
+            new Token(TokenType.False, 'false'),
+            new Token(TokenType.Semicolon, ';'),
+            new Token(TokenType.R_Brace, '}'),
+            new Token(TokenType.Int, '10'),
+            new Token(TokenType.Eq, '=='),
+            new Token(TokenType.Int, '10'),
+            new Token(TokenType.Semicolon, ';'),
+            new Token(TokenType.Int, '10'),
+            new Token(TokenType.Not_Eq, '!='),
+            new Token(TokenType.Int, '9'),
             new Token(TokenType.Semicolon, ';'),
             new Token(TokenType.EOF, ''),
         ]

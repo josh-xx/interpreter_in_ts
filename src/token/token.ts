@@ -19,7 +19,13 @@ export enum TokenType {
     R_Brace = "}",
     Function = "fn",
     Let = "let",
-    Return = "return"
+    True = 'true',
+    False = 'false',
+    If = 'if',
+    Else = 'else',
+    Return = 'return',
+    Eq = '==',
+    Not_Eq = '!=',
 }
 
 export class Token {
@@ -27,16 +33,4 @@ export class Token {
         public type: TokenType,
         public literal: string,
     ) {}
-}
-
-class TokenList {
-    constructor(
-        public tokens: Token[] = [],
-        public current: number = -1,
-    ) {}
-
-    nextToken() {
-        this.current += 1
-        return this.tokens[this.current]
-    }
 }

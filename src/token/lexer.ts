@@ -10,6 +10,10 @@ export class Lexer {
         return this.input[++this.position]
     }
 
+    peekChar() {
+        return this.input[this.position + 1]
+    }
+
     currentChar() {
         return this.input[this.position]
     }
@@ -48,6 +52,14 @@ export class Lexer {
             return new Token(TokenType.Let, word)
         } else if (word === 'return') {
             return new Token(TokenType.Return, word)
+        } else if (word === 'true') {
+            return new Token(TokenType.True, word)
+        } else if (word === 'false') {
+            return new Token(TokenType.False, word)
+        } else if (word === 'if') {
+            return new Token(TokenType.If, word)
+        } else if (word === 'else') {
+            return new Token(TokenType.Else, word)
         } else {
             return new Token(TokenType.Identifier, word)
         }
@@ -77,7 +89,12 @@ export class Lexer {
         if (c === '+') {
             token = new Token(TokenType.Plus, c)
         } else if (c === '=') {
-            token = new Token(TokenType.Assign, c)
+            if (this.peekChar() === '=') {
+                this.nextChar()
+                token = new Token(TokenType.Eq, '==')
+            } else {
+                token = new Token(TokenType.Assign, c)
+            }
         } else if (c === ',') {
             token = new Token(TokenType.Comma, c)
         } else if (c === ';') {
@@ -103,7 +120,12 @@ export class Lexer {
         } else if (c === '>') {
             token = new Token(TokenType.GreaterThan, c)
         } else if (c === '!') {
-            token = new Token(TokenType.Bang, c)
+            if (this.peekChar() === '=') {
+                this.nextChar()
+                token = new Token(TokenType.Not_Eq, '!=')
+            } else {
+                token = new Token(TokenType.Bang, c)
+            }
         } else {
             if (this.isAlphabet(c)) {
                 return this.readWord()

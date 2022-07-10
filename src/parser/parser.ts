@@ -13,6 +13,25 @@ import {
 type PrefixParseFn = () => Expression
 type InfixParseFn = (expression: Expression) => Expression
 
+export enum PrecedenceOrder {
+    Lowest,
+    Equal,
+    LessGreater,
+    Sum,
+    Product
+}
+
+export const PrecedenceMap: Partial<Record<TokenType, PrecedenceOrder>> = {
+    [TokenType.Eq]: PrecedenceOrder.Equal,
+    [TokenType.Not_Eq]: PrecedenceOrder.Equal,
+    [TokenType.LessThan]: PrecedenceOrder.LessGreater,
+    [TokenType.GreaterThan]: PrecedenceOrder.LessGreater,
+    [TokenType.Plus]: PrecedenceOrder.Sum,
+    [TokenType.Minus]: PrecedenceOrder.Sum,
+    [TokenType.Asterisk]: PrecedenceOrder.Product,
+    [TokenType.Slash]: PrecedenceOrder.Product,
+}
+
 export class Parser {
     public currentToken: Token
     public peekToken: Token
@@ -161,5 +180,21 @@ export class Parser {
         }
 
         return program
+    }
+
+    currentPrecedence(): PrecedenceOrder {
+        let p = PrecedenceMap[this.currentToken.type]
+        if (p === undefined) {
+            return PrecedenceOrder.Lowest
+        }
+        return p
+    }
+
+    peekPrecedence(): PrecedenceOrder {
+        let p = PrecedenceMap[this.peekToken.type]
+        if (p === undefined) {
+            return PrecedenceOrder.Lowest
+        }
+        return p
     }
 }

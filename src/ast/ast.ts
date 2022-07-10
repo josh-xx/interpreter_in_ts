@@ -57,6 +57,21 @@ export class PrefixExpression implements Expression {
     }
 }
 
+export class InfixExpression implements Expression {
+    constructor(
+        public token: Token,
+        public operator: string,
+        public left: Expression | null,
+        public right: Expression | null,
+    ) {}
+    tokenLiteral(): string {
+        return this.token.literal
+    }
+    string(): string {
+        return `${this.left?.string() || ''} ${this.operator} ${this.right?.string() || ''}`
+    }
+}
+
 export class LetStatement implements Statement {
     constructor(
         public token: Token,

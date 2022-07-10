@@ -3,6 +3,7 @@ import {Parser} from "../parser";
 import {
     ExpressionStatement,
     Identifier,
+    InfixExpression,
     IntLiteral,
     LetStatement,
     PrefixExpression,
@@ -115,8 +116,45 @@ describe('parser', function () {
             if(!(expression instanceof PrefixExpression)) throw 'bad statement'
             expect(expression.operator).toBe(operators[i])
             expect(expression.right?.string()).toBe(rights[i])
+            expect(expression.right).toBeInstanceOf(types[i])
 
             i++
         }
     });
+
+    it('infix', function () {
+        let input = `
+5 + 5;
+5 - 5;
+5 * 5;
+5 / 5;
+5 > 5;
+5 < 5;
+5 == 5;
+5 != 5;
+   `
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(2)
+        let i = 0
+        let lefts = ['5', '5', '5', '5', '5', ]
+        let operators = ['+', '-', '*', '/', '>', '<', '==', '!=']
+        let rights = ['5', '5', '5', '5', '5', ]
+        for (let statement of program.statements) {
+            expect(statement).toBeInstanceOf(ExpressionStatement)
+            if(!(statement instanceof ExpressionStatement)) throw 'bad statement'
+            let expression = statement.expression
+            expect(expression).toBeInstanceOf(InfixExpression)
+            if(!(expression instanceof InfixExpression)) throw 'bad statement'
+            expect(expression.left?.string()).toBe(lefts[i])
+            expect(expression.operator).toBe(operators[i])
+            expect(expression.right?.string()).toBe(rights[i])
+
+            i++
+        }
+    });
+
 });
