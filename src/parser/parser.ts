@@ -137,9 +137,9 @@ export class Parser {
             return null
         }
         let leftExp = prefix()
+        // 从 lowest 开始左结合
         while (!this.peekTokenIs(TokenType.Semicolon) && precedence < this.peekPrecedence()) {
-            // 1 + 2 * 3    ->    (1 + (2 * 3))
-            //   p c peek
+            // 不停右结合
             let infix = this.infixParseFnMap[this.peekToken.type]
             if (!infix) {
                 console.error('no infix for', this.currentToken.type, 'is defined', precedence, this.peekPrecedence(), this.currentToken, this.peekToken)
@@ -149,8 +149,6 @@ export class Parser {
 
             leftExp = infix(leftExp)
         }
-        // 1 + 2 + 3    ->    ((1 + 2) + 3)
-        //   p c peek
         return leftExp
     }
 
