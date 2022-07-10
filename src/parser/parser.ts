@@ -1,11 +1,25 @@
 import {Lexer} from "../token/lexer";
 import {Token, TokenType} from "../token/token";
-import {Identifier, LetStatement, Program, ReturnStatement} from "../ast/ast";
+import {
+    Expression,
+    ExpressionStatement,
+    Identifier,
+    IntLiteral,
+    LetStatement, PrefixExpression,
+    Program,
+    ReturnStatement
+} from "../ast/ast";
+
+type PrefixParseFn = () => Expression
+type InfixParseFn = (expression: Expression) => Expression
 
 export class Parser {
     public currentToken: Token
     public peekToken: Token
     public errors: string[] = []
+
+    public prefixParseFnMap: Partial<Record<TokenType, PrefixParseFn>> = {}
+    public infixParseFnMap: Partial<Record<TokenType, InfixParseFn>> = {}
 
     constructor(
         public lexer: Lexer,
@@ -15,6 +29,38 @@ export class Parser {
 
         this.currentToken = t1
         this.peekToken = t2
+
+        this.addPrefixFn(TokenType.Identifier, this.parseIdentifier)
+        this.addPrefixFn(TokenType.Int, this.parseIntLiteral)
+        this.addPrefixFn(TokenType.Minus, this.parsePrefixExpression)
+        this.addPrefixFn(TokenType.Bang, this.parsePrefixExpression)
+    }
+
+    parseIdentifier = () => {
+        return new Identifier(this.currentToken, this.currentToken.literal)
+    }
+
+    parseIntLiteral = () => {
+        return new IntLiteral(this.currentToken, Number(this.currentToken.literal))
+    }
+
+    parsePrefixExpression = () => {
+        let token = this.currentToken
+        let operator = this.currentToken.literal
+        this.nextToken()
+        let expression = this.parseExpression()
+        if (expression === null) {
+            console.error('parse expression error')
+        }
+        return new PrefixExpression(token, operator, expression)
+    }
+
+    addPrefixFn(type: TokenType, fn: PrefixParseFn) {
+        this.prefixParseFnMap[type] = fn
+    }
+
+    addInfixFn(type: TokenType, fn: InfixParseFn) {
+        this.infixParseFnMap[type] = fn
     }
 
     nextToken() {
@@ -43,6 +89,24 @@ export class Parser {
             this.onIllegalPeekTokenError(type)
             return false
         }
+    }
+
+    parseExpression() {
+        let prefix = this.prefixParseFnMap[this.currentToken.type]
+        if (!prefix) {
+            console.log('no prefix for', this.currentToken.type, 'is defined')
+            return null
+        }
+        let leftExp = prefix()
+        return leftExp
+    }
+
+    parseExpressionStatement() {
+        let expression = this.parseExpression()
+        if (!expression) return null
+        let s = new ExpressionStatement(this.currentToken, expression)
+        while (!this.currentTokenIs(TokenType.Semicolon)) this.nextToken()
+        return s
     }
 
     parseLetStatement() {
@@ -80,7 +144,7 @@ export class Parser {
         } else if (this.currentTokenIs(TokenType.Return)) {
             return this.parseReturnStatement()
         } else {
-            return null
+            return this.parseExpressionStatement()
         }
     }
 

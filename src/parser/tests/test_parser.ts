@@ -1,6 +1,13 @@
 import {Lexer} from "../../token/lexer";
 import {Parser} from "../parser";
-import {LetStatement, ReturnStatement} from "../../ast/ast";
+import {
+    ExpressionStatement,
+    Identifier,
+    IntLiteral,
+    LetStatement,
+    PrefixExpression,
+    ReturnStatement
+} from "../../ast/ast";
 
 describe('parser', function () {
     it('let', function () {
@@ -53,4 +60,63 @@ describe('parser', function () {
         }
     });
 
+    it('identifier', function () {
+        let input = `
+        foobar;
+   `
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+        let statement = program.statements[0]
+        if(!(statement instanceof ExpressionStatement)) throw 'bad statement'
+        if(!(statement.expression instanceof Identifier)) throw 'bad expression'
+        expect(statement.expression.value).toBe('foobar')
+    });
+
+    it('int literal', function () {
+        let input = `
+        1;
+   `
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+        let statement = program.statements[0]
+        if(!(statement instanceof ExpressionStatement)) throw 'bad statement'
+        if(!(statement.expression instanceof IntLiteral)) throw 'bad expression'
+        expect(statement.expression.value).toBe(1)
+    });
+
+    it('prefix', function () {
+        let input = `
+        -1;
+        !2;
+   `
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(2)
+        let i = 0
+        let operators = ['-', '!']
+        let types = [Identifier, IntLiteral]
+        let rights = ['1', '2']
+        for (let statement of program.statements) {
+            expect(statement).toBeInstanceOf(ExpressionStatement)
+            if(!(statement instanceof ExpressionStatement)) throw 'bad statement'
+            let expression = statement.expression
+            expect(expression).toBeInstanceOf(PrefixExpression)
+            if(!(expression instanceof PrefixExpression)) throw 'bad statement'
+            expect(expression.operator).toBe(operators[i])
+            expect(expression.right?.string()).toBe(rights[i])
+
+            i++
+        }
+    });
 });
