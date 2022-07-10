@@ -59,6 +59,7 @@ export class Parser {
         this.addPrefixFn(TokenType.Bang, this.parsePrefixExpression)
         this.addPrefixFn(TokenType.True, this.parseBooleanLiteral)
         this.addPrefixFn(TokenType.False, this.parseBooleanLiteral)
+        this.addPrefixFn(TokenType.L_Paren, this.parseGroupedExpression)
 
         this.addInfixFn(TokenType.Asterisk, this.parseInfixExpression)
         this.addInfixFn(TokenType.Slash, this.parseInfixExpression)
@@ -77,6 +78,18 @@ export class Parser {
         let right = this.parseExpression(precedence)
 
         return new InfixExpression(token, token.literal, left, right)
+    }
+
+    parseGroupedExpression = () => {
+        this.nextToken()
+        let expression = this.parseExpression(PrecedenceOrder.Lowest)
+
+        if (!this.nextTokenIfPeekIs(TokenType.R_Paren)) {
+            console.error('parse grouped expression paren not match')
+            return expression
+        }
+
+        return expression
     }
 
     parseIdentifier = () => {
@@ -138,11 +151,10 @@ export class Parser {
         }
     }
 
-    parseExpression(precedence: number) {
+    parseExpression(precedence: PrecedenceOrder) {
         let prefix = this.prefixParseFnMap[this.currentToken.type]
         if (!prefix) {
-            console.error('no prefix for', this.currentToken.type, 'is defined')
-            return null
+            throw `no prefix for ${this.currentToken.type} is defined`
         }
         let leftExp = prefix()
         // 从 lowest 开始左结合
@@ -151,7 +163,7 @@ export class Parser {
             let infix = this.infixParseFnMap[this.peekToken.type]
             if (!infix) {
                 console.error('no infix for', this.currentToken.type, 'is defined', precedence, this.peekPrecedence(), this.currentToken, this.peekToken)
-                return null
+                throw 'error'
             }
             this.nextToken()
 
@@ -164,7 +176,7 @@ export class Parser {
         let expression = this.parseExpression(PrecedenceOrder.Lowest)
         if (!expression) return null
         let s = new ExpressionStatement(this.currentToken, expression)
-        while (!this.currentTokenIs(TokenType.Semicolon)) this.nextToken()
+        while (this.peekTokenIs(TokenType.Semicolon)) this.nextToken()
         return s
     }
 

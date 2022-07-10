@@ -190,4 +190,61 @@ describe('parser', function () {
         expect(statements[3].string()).toBe('let barfoo = false')
     });
 
+    it('group1', function () {
+        let input1 = ['1 + (2 + 3) + 4', "((1 + (2 + 3)) + 4)"]
+        let lexer = new Lexer(input1[0])
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+        expect(program.statements[0].string()).toBe(input1[1])
+    });
+
+    it('group2', function () {
+        let input1 = ["(5 + 5) * 2", "((5 + 5) * 2)",]
+        let lexer = new Lexer(input1[0])
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+        expect(program.statements[0].string()).toBe(input1[1])
+    });
+
+    it('group3', function () {
+        let input1 = ["2 / (5 + 5)",
+            "(2 / (5 + 5))",]
+        let lexer = new Lexer(input1[0])
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+        expect(program.statements[0].string()).toBe(input1[1])
+    });
+
+    it('group4', function () {
+        let input1 = ["-(5 + 5)", "(-(5 + 5))",]
+        let lexer = new Lexer(input1[0])
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+        expect(program.statements[0].string()).toBe(input1[1])
+    });
+
+    it('group5', function () {
+        let input1 = ["!(true == true)",
+            "(!(true == true))",]
+        let lexer = new Lexer(input1[0])
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+        expect(program.statements[0].string()).toBe(input1[1])
+    });
+
 });
