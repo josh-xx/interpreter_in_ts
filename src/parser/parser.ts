@@ -1,6 +1,6 @@
 import {Lexer} from "../token/lexer";
 import {Token, TokenType} from "../token/token";
-import {Identifier, LetStatement, Program, Statement} from "../ast/ast";
+import {Identifier, LetStatement, Program, ReturnStatement, Statement} from "../ast/ast";
 
 export class Parser {
     public currentToken: Token
@@ -38,18 +38,32 @@ export class Parser {
             return null
         }
 
+        // TODO
         // skip to ;
         while (!this.currentTokenIs(TokenType.Semicolon)) {
             this.nextToken()
         }
 
-        // TODO
         return new LetStatement(letToken, name, null)
+    }
+
+    parseReturnStatement() {
+        // let a = 1
+        let returnToken = this.currentToken
+        // TODO
+        // skip to ;
+        while (!this.currentTokenIs(TokenType.Semicolon)) {
+            this.nextToken()
+        }
+
+        return new ReturnStatement(returnToken, null)
     }
 
     parseStatement() {
         if (this.currentTokenIs(TokenType.Let)) {
-            return this.parseLetStatement()
+            return this.parseLetStatement() }
+        else if (this.currentTokenIs(TokenType.Return)) {
+            return this.parseReturnStatement()
         } else {
             return null
         }
@@ -79,7 +93,7 @@ export class Parser {
     }
 
     nextTokenIfPeekIs(type: TokenType) {
-        if (this.peekToken.type === type) {
+        if (this.peekTokenIs(type)) {
             this.nextToken()
             return true
         } else {

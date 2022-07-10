@@ -17,7 +17,7 @@ describe('test parser', () => {
     it('let', () => {
         let input = `
         let x = 5;
-        let a y = 10;
+        let y = 10;
         let foobar = 838383;
         `
 
@@ -40,4 +40,32 @@ describe('test parser', () => {
             i++
         }
     })
+
+    it('return', () => {
+        let input = `
+        return 5;
+        return 10;
+        return add(15);
+        `
+
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(checkParserErrors(parser)).toBe(false)
+
+        expect(program.statements.length).toBe(3)
+
+        // let names = ['x', 'y', 'foobar']
+        // let i = 0
+        // for (let statement of program.statements) {
+        //     expect(statement instanceof LetStatement).toBe(true)
+        //     if (!(statement instanceof LetStatement)) throw ''
+        //
+        //     expect(statement.name.value).toBe(names[i])
+        //     i++
+        // }
+    })
+
 })
