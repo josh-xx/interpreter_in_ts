@@ -1,9 +1,11 @@
 import {Lexer} from "../token/lexer";
 import {Token, TokenType} from "../token/token";
 import {
+    BooleanLiteral,
     Expression,
     ExpressionStatement,
-    Identifier, InfixExpression,
+    Identifier,
+    InfixExpression,
     IntLiteral,
     LetStatement,
     PrefixExpression,
@@ -55,6 +57,8 @@ export class Parser {
         this.addPrefixFn(TokenType.Int, this.parseIntLiteral)
         this.addPrefixFn(TokenType.Minus, this.parsePrefixExpression)
         this.addPrefixFn(TokenType.Bang, this.parsePrefixExpression)
+        this.addPrefixFn(TokenType.True, this.parseBooleanLiteral)
+        this.addPrefixFn(TokenType.False, this.parseBooleanLiteral)
 
         this.addInfixFn(TokenType.Asterisk, this.parseInfixExpression)
         this.addInfixFn(TokenType.Slash, this.parseInfixExpression)
@@ -81,6 +85,10 @@ export class Parser {
 
     parseIntLiteral = () => {
         return new IntLiteral(this.currentToken, Number(this.currentToken.literal))
+    }
+
+    parseBooleanLiteral = () => {
+        return new BooleanLiteral(this.currentToken, JSON.parse(this.currentToken.literal))
     }
 
     parsePrefixExpression = () => {
@@ -175,18 +183,40 @@ export class Parser {
             return null
         }
 
-        while (this.peekTokenIs(TokenType.Semicolon)) this.nextToken()
+        this.nextToken()
+        let expression = this.parseExpression(PrecedenceOrder.Lowest)
+        if (expression === null) {
+            console.error('expression parse error')
+        }
 
-        return new LetStatement(letToken, identifier, null)
+        if (!this.peekTokenIs(TokenType.Semicolon)) {
+            console.error('error content', this.currentToken, this.peekToken)
+            while (this.peekTokenIs(TokenType.Semicolon)) this.nextToken()
+        } else {
+            this.nextToken()
+        }
+
+        return new LetStatement(letToken, identifier, expression)
     }
 
     parseReturnStatement() {
         // let a = 1
         let returnToken = this.currentToken
 
-        while (this.peekTokenIs(TokenType.Semicolon)) this.nextToken()
+        this.nextToken()
+        let expression = this.parseExpression(PrecedenceOrder.Lowest)
+        if (expression === null) {
+            console.error('expression parse error')
+        }
 
-        return new ReturnStatement(returnToken, null)
+        if (!this.peekTokenIs(TokenType.Semicolon)) {
+            console.error('error content', this.currentToken, this.peekToken)
+            while (this.peekTokenIs(TokenType.Semicolon)) this.nextToken()
+        } else {
+            this.nextToken()
+        }
+
+        return new ReturnStatement(returnToken, expression)
     }
 
     parseStatement() {

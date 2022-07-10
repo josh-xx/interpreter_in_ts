@@ -1,6 +1,7 @@
 import {Lexer} from "../../token/lexer";
 import {Parser} from "../parser";
 import {
+    BooleanLiteral,
     ExpressionStatement,
     Identifier,
     InfixExpression,
@@ -25,7 +26,7 @@ describe('parser', function () {
         expect(program.statements.length).toBe(3)
 
         let names = ['x', 'y', 'foobar']
-        let strings = ['let x = ', 'let y = ', 'let foobar = ']
+        let strings = ['let x = 5', 'let y = 10', 'let foobar = 838383']
         let i = 0
         for (let statement of program.statements) {
             expect(statement instanceof LetStatement).toBe(true)
@@ -50,7 +51,7 @@ describe('parser', function () {
 
         expect(program.statements.length).toBe(3)
 
-        let strings = ['return ', 'return ', 'return ']
+        let strings = ['return 5', 'return 10', 'return 838383']
         let i = 0
         for (let statement of program.statements) {
             expect(statement instanceof ReturnStatement).toBe(true)
@@ -106,7 +107,7 @@ describe('parser', function () {
         expect(program.statements.length).toBe(2)
         let i = 0
         let operators = ['-', '!']
-        let types = [Identifier, IntLiteral]
+        let types = [IntLiteral, IntLiteral]
         let rights = ['1', '2']
         for (let statement of program.statements) {
             expect(statement).toBeInstanceOf(ExpressionStatement)
@@ -155,6 +156,38 @@ describe('parser', function () {
 
             i++
         }
+    });
+
+    it('boolean', function () {
+        let input = `
+        true;
+        false;
+        let foobar = true;
+        let barfoo = false;
+   `
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(4)
+
+        let statements = program.statements
+
+        expect(statements[0]).toBeInstanceOf(ExpressionStatement)
+        if (!(statements[0] instanceof ExpressionStatement)) throw 'bad statement'
+        expect(statements[0].expression).toBeInstanceOf(BooleanLiteral)
+        if (!(statements[0].expression instanceof BooleanLiteral)) throw 'bad statement'
+        expect(statements[0].expression.value).toBe(true)
+
+        expect(statements[1]).toBeInstanceOf(ExpressionStatement)
+        if (!(statements[1] instanceof ExpressionStatement)) throw 'bad statement'
+        expect(statements[1].expression).toBeInstanceOf(BooleanLiteral)
+        if (!(statements[1].expression instanceof BooleanLiteral)) throw 'bad statement'
+        expect(statements[1].expression.value).toBe(false)
+
+        expect(statements[2].string()).toBe('let foobar = true')
+        expect(statements[3].string()).toBe('let barfoo = false')
     });
 
 });

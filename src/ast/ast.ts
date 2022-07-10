@@ -43,6 +43,19 @@ export class IntLiteral implements Expression {
     }
 }
 
+export class BooleanLiteral implements Expression {
+    constructor(
+        public token: Token,
+        public value: boolean,
+    ) {}
+    tokenLiteral(): string {
+        return this.token.literal
+    }
+    string(): string {
+        return String(this.value)
+    }
+}
+
 export class PrefixExpression implements Expression {
     constructor(
         public token: Token,
@@ -76,8 +89,7 @@ export class LetStatement implements Statement {
     constructor(
         public token: Token,
         public name: Identifier,
-        // TODO should be an expression
-        public value: null,
+        public value: Expression | null,
     ) {}
 
     tokenLiteral(): string {
@@ -85,15 +97,14 @@ export class LetStatement implements Statement {
     }
 
     string(): string {
-        return `${this.token.literal} ${this.name.value} = `
+        return `${this.token.literal} ${this.name.value} = ${this.value?.string() || ''}`
     }
 }
 
 export class ReturnStatement implements Statement {
     constructor(
         public token: Token,
-        // TODO should be an expression
-        public value: null,
+        public value: Expression | null,
     ) {}
 
     tokenLiteral(): string {
@@ -101,7 +112,7 @@ export class ReturnStatement implements Statement {
     }
 
     string(): string {
-        return `return `
+        return `return ${this.value?.string() || ''}`
     }
 }
 
