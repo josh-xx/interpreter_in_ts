@@ -138,11 +138,11 @@ describe('parser', function () {
 
         let program = parser.parseProgram()
 
-        expect(program.statements.length).toBe(2)
+        expect(program.statements.length).toBe(8)
         let i = 0
-        let lefts = ['5', '5', '5', '5', '5', ]
+        let lefts = ['5', '5', '5', '5', '5', '5', '5', '5',]
         let operators = ['+', '-', '*', '/', '>', '<', '==', '!=']
-        let rights = ['5', '5', '5', '5', '5', ]
+        let rights = ['5', '5', '5', '5', '5', '5', '5', '5',]
         for (let statement of program.statements) {
             expect(statement).toBeInstanceOf(ExpressionStatement)
             if(!(statement instanceof ExpressionStatement)) throw 'bad statement'

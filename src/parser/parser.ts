@@ -3,9 +3,10 @@ import {Token, TokenType} from "../token/token";
 import {
     Expression,
     ExpressionStatement,
-    Identifier,
+    Identifier, InfixExpression,
     IntLiteral,
-    LetStatement, PrefixExpression,
+    LetStatement,
+    PrefixExpression,
     Program,
     ReturnStatement
 } from "../ast/ast";
@@ -18,7 +19,8 @@ export enum PrecedenceOrder {
     Equal,
     LessGreater,
     Sum,
-    Product
+    Product,
+    Prefix,
 }
 
 export const PrecedenceMap: Partial<Record<TokenType, PrecedenceOrder>> = {
@@ -53,6 +55,24 @@ export class Parser {
         this.addPrefixFn(TokenType.Int, this.parseIntLiteral)
         this.addPrefixFn(TokenType.Minus, this.parsePrefixExpression)
         this.addPrefixFn(TokenType.Bang, this.parsePrefixExpression)
+
+        this.addInfixFn(TokenType.Asterisk, this.parseInfixExpression)
+        this.addInfixFn(TokenType.Slash, this.parseInfixExpression)
+        this.addInfixFn(TokenType.Plus, this.parseInfixExpression)
+        this.addInfixFn(TokenType.Minus, this.parseInfixExpression)
+        this.addInfixFn(TokenType.Eq, this.parseInfixExpression)
+        this.addInfixFn(TokenType.Not_Eq, this.parseInfixExpression)
+        this.addInfixFn(TokenType.LessThan, this.parseInfixExpression)
+        this.addInfixFn(TokenType.GreaterThan, this.parseInfixExpression)
+    }
+
+    parseInfixExpression = (left: Expression) => {
+        let token = this.currentToken
+        let precedence = this.currentPrecedence()
+        this.nextToken()
+        let right = this.parseExpression(precedence)
+
+        return new InfixExpression(token, token.literal, left, right)
     }
 
     parseIdentifier = () => {
@@ -67,7 +87,7 @@ export class Parser {
         let token = this.currentToken
         let operator = this.currentToken.literal
         this.nextToken()
-        let expression = this.parseExpression()
+        let expression = this.parseExpression(PrecedenceOrder.Prefix)
         if (expression === null) {
             console.error('parse expression error')
         }
@@ -110,18 +130,32 @@ export class Parser {
         }
     }
 
-    parseExpression() {
+    parseExpression(precedence: number) {
         let prefix = this.prefixParseFnMap[this.currentToken.type]
         if (!prefix) {
-            console.log('no prefix for', this.currentToken.type, 'is defined')
+            console.error('no prefix for', this.currentToken.type, 'is defined')
             return null
         }
         let leftExp = prefix()
+        while (!this.peekTokenIs(TokenType.Semicolon) && precedence < this.peekPrecedence()) {
+            // 1 + 2 * 3    ->    (1 + (2 * 3))
+            //   p c peek
+            let infix = this.infixParseFnMap[this.peekToken.type]
+            if (!infix) {
+                console.error('no infix for', this.currentToken.type, 'is defined', precedence, this.peekPrecedence(), this.currentToken, this.peekToken)
+                return null
+            }
+            this.nextToken()
+
+            leftExp = infix(leftExp)
+        }
+        // 1 + 2 + 3    ->    ((1 + 2) + 3)
+        //   p c peek
         return leftExp
     }
 
     parseExpressionStatement() {
-        let expression = this.parseExpression()
+        let expression = this.parseExpression(PrecedenceOrder.Lowest)
         if (!expression) return null
         let s = new ExpressionStatement(this.currentToken, expression)
         while (!this.currentTokenIs(TokenType.Semicolon)) this.nextToken()
