@@ -131,3 +131,34 @@ export class ExpressionStatement implements Statement {
     }
 }
 
+export class BlockStatement implements Statement {
+    constructor(
+        public token: Token,
+        public statements: (Statement | null)[]
+    ) {}
+
+    tokenLiteral(): string {
+        return this.token.literal
+    }
+
+    string(): string {
+        return `{ ${this.statements.map(s => s?.string() || '').join('; ')} }`
+    }
+}
+
+export class IfExpression implements Expression {
+    constructor(
+        public token: Token,
+        public condition: Expression,
+        public consequences: BlockStatement,
+        public alternatives: BlockStatement | null = null,
+    ) {}
+
+    tokenLiteral(): string {
+        return this.token.literal
+    }
+
+    string(): string {
+        return `if (${this.condition.string()}) ${this.consequences.string()} ${this.alternatives?.string() || ''}`
+    }
+}

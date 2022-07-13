@@ -4,6 +4,7 @@ import {
     BooleanLiteral,
     ExpressionStatement,
     Identifier,
+    IfExpression,
     InfixExpression,
     IntLiteral,
     LetStatement,
@@ -245,6 +246,52 @@ let barfoo = false;
 
         expect(program.statements.length).toBe(1)
         expect(program.statements[0].string()).toBe(input1[1])
+    });
+
+    it('if1', function () {
+        let input = `if (x < y) { x }`
+
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+
+        let statement = program.statements[0]
+        expect(statement).toBeInstanceOf(ExpressionStatement)
+        if (!(statement instanceof ExpressionStatement)) throw 'bad statement'
+
+        let ifExpression = statement.expression
+        expect(ifExpression).toBeInstanceOf(IfExpression)
+        if (!(ifExpression instanceof IfExpression)) throw 'bad statement'
+
+        expect(ifExpression.condition.string()).toBe('(x < y)')
+        expect(ifExpression.consequences.string()).toBe('{ x }')
+        expect(ifExpression.alternatives).toBe(null)
+    });
+
+    it('if2', function () {
+        let input = `if (x < y) { x } else { y }`
+
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+
+        expect(program.statements.length).toBe(1)
+
+        let statement = program.statements[0]
+        expect(statement).toBeInstanceOf(ExpressionStatement)
+        if (!(statement instanceof ExpressionStatement)) throw 'bad statement'
+
+        let ifExpression = statement.expression
+        expect(ifExpression).toBeInstanceOf(IfExpression)
+        if (!(ifExpression instanceof IfExpression)) throw 'bad statement'
+
+        expect(ifExpression.condition.string()).toBe('(x < y)')
+        expect(ifExpression.consequences.string()).toBe('{ x }')
+        expect(ifExpression.alternatives?.string()).toBe('{ y }')
     });
 
 });

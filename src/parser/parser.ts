@@ -1,10 +1,12 @@
 import {Lexer} from "../token/lexer";
 import {Token, TokenType} from "../token/token";
 import {
+    BlockStatement,
     BooleanLiteral,
     Expression,
     ExpressionStatement,
     Identifier,
+    IfExpression,
     InfixExpression,
     IntLiteral,
     LetStatement,
@@ -60,6 +62,7 @@ export class Parser {
         this.addPrefixFn(TokenType.True, this.parseBooleanLiteral)
         this.addPrefixFn(TokenType.False, this.parseBooleanLiteral)
         this.addPrefixFn(TokenType.L_Paren, this.parseGroupedExpression)
+        this.addPrefixFn(TokenType.If, this.parseIfExpression)
 
         this.addInfixFn(TokenType.Asterisk, this.parseInfixExpression)
         this.addInfixFn(TokenType.Slash, this.parseInfixExpression)
@@ -149,6 +152,49 @@ export class Parser {
             this.onIllegalPeekTokenError(type)
             return false
         }
+    }
+
+    parseBlockStatement() {
+        let token = this.currentToken
+        this.nextToken()
+
+        let statements = []
+        while (!this.currentTokenIs(TokenType.R_Brace) && !this.currentTokenIs(TokenType.EOF)) {
+            statements.push(this.parseStatement())
+            this.nextToken()
+        }
+
+        return new BlockStatement(token, statements)
+    }
+
+    parseIfExpression = () => {
+        let token = this.currentToken
+        if (!this.nextTokenIfPeekIs(TokenType.L_Paren)) {
+            throw ''
+        }
+        this.nextToken()
+        let condition = this.parseExpression(PrecedenceOrder.Lowest)
+        if (!this.nextTokenIfPeekIs(TokenType.R_Paren)) {
+            throw ''
+        }
+        if (!this.nextTokenIfPeekIs(TokenType.L_Brace)) {
+            throw ''
+        }
+        let consequences = this.parseBlockStatement()
+        // current -> }
+        let alternatives = null
+        if (this.peekTokenIs(TokenType.Else)) {
+            this.nextToken()
+
+            if (!this.nextTokenIfPeekIs(TokenType.L_Brace)) {
+                throw ''
+            }
+
+            alternatives = this.parseBlockStatement()
+        }
+        // } left
+
+        return new IfExpression(token, condition, consequences, alternatives)
     }
 
     parseExpression(precedence: PrecedenceOrder) {
