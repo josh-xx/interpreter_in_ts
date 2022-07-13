@@ -162,3 +162,19 @@ export class IfExpression implements Expression {
         return `if (${this.condition.string()}) ${this.consequences.string()} ${this.alternatives?.string() || ''}`
     }
 }
+
+export class FunctionLiteral implements Expression {
+    constructor(
+        public token: Token,
+        public parameters: Identifier[],
+        public body: BlockStatement,
+    ) {}
+
+    tokenLiteral(): string {
+        return this.token.literal
+    }
+
+    string(): string {
+        return `fn (${this.parameters.map(p => p.string()).join(', ')}) ${this.body.string()}`
+    }
+}

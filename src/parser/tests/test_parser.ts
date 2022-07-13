@@ -2,7 +2,7 @@ import {Lexer} from "../../token/lexer";
 import {Parser} from "../parser";
 import {
     BooleanLiteral,
-    ExpressionStatement,
+    ExpressionStatement, FunctionLiteral,
     Identifier,
     IfExpression,
     InfixExpression,
@@ -292,6 +292,39 @@ let barfoo = false;
         expect(ifExpression.condition.string()).toBe('(x < y)')
         expect(ifExpression.consequences.string()).toBe('{ x }')
         expect(ifExpression.alternatives?.string()).toBe('{ y }')
+    });
+
+    it('fn1', function () {
+        let input = `
+fn() {};        
+fn(x) {};        
+fn(x, y, z) {};        
+`
+        let lexer = new Lexer(input)
+        let parser = new Parser(lexer)
+
+        let program = parser.parseProgram()
+        let statements = program.statements
+
+        expect(statements.length).toBe(3)
+
+        expect(statements[0]).toBeInstanceOf(ExpressionStatement)
+        if (!(statements[0] instanceof ExpressionStatement)) throw 'bad statement'
+        expect(statements[0].expression).toBeInstanceOf(FunctionLiteral)
+        if (!(statements[0].expression instanceof FunctionLiteral)) throw 'bad statement'
+        expect(statements[0].expression.string()).toBe('fn () {  }')
+
+        expect(statements[1]).toBeInstanceOf(ExpressionStatement)
+        if (!(statements[1] instanceof ExpressionStatement)) throw 'bad statement'
+        expect(statements[1].expression).toBeInstanceOf(FunctionLiteral)
+        if (!(statements[1].expression instanceof FunctionLiteral)) throw 'bad statement'
+        expect(statements[1].expression.string()).toBe('fn (x) {  }')
+
+        expect(statements[2]).toBeInstanceOf(ExpressionStatement)
+        if (!(statements[2] instanceof ExpressionStatement)) throw 'bad statement'
+        expect(statements[2].expression).toBeInstanceOf(FunctionLiteral)
+        if (!(statements[2].expression instanceof FunctionLiteral)) throw 'bad statement'
+        expect(statements[2].expression.string()).toBe('fn (x, y, z) {  }')
     });
 
 });

@@ -5,6 +5,7 @@ import {
     BooleanLiteral,
     Expression,
     ExpressionStatement,
+    FunctionLiteral,
     Identifier,
     IfExpression,
     InfixExpression,
@@ -63,6 +64,7 @@ export class Parser {
         this.addPrefixFn(TokenType.False, this.parseBooleanLiteral)
         this.addPrefixFn(TokenType.L_Paren, this.parseGroupedExpression)
         this.addPrefixFn(TokenType.If, this.parseIfExpression)
+        this.addPrefixFn(TokenType.Function, this.parseFunctionLiteral)
 
         this.addInfixFn(TokenType.Asterisk, this.parseInfixExpression)
         this.addInfixFn(TokenType.Slash, this.parseInfixExpression)
@@ -195,6 +197,47 @@ export class Parser {
         // } left
 
         return new IfExpression(token, condition, consequences, alternatives)
+    }
+
+    parseFunctionParameters() {
+        let identifiers: Identifier[] = []
+        // empty
+        if (this.peekTokenIs(TokenType.R_Paren)) {
+            this.nextToken()
+            return identifiers
+        }
+        this.nextToken() // first identifier
+        identifiers.push(new Identifier(this.currentToken, this.currentToken.literal))
+
+        while (this.peekTokenIs(TokenType.Comma)) {
+            this.nextToken() // ,
+            this.nextToken() // identifier
+            identifiers.push(new Identifier(this.currentToken, this.currentToken.literal))
+        }
+
+        if (!this.nextTokenIfPeekIs(TokenType.R_Paren)) {
+            throw ''
+        }
+
+        return identifiers
+    }
+
+    parseFunctionLiteral = () => {
+        let token = this.currentToken
+
+        if (!this.nextTokenIfPeekIs(TokenType.L_Paren)) {
+            throw ''
+        }
+
+        let parameters = this.parseFunctionParameters()
+
+        if (!this.nextTokenIfPeekIs(TokenType.L_Brace)) {
+            throw ''
+        }
+
+        let body = this.parseBlockStatement()
+
+        return new FunctionLiteral(token, parameters, body)
     }
 
     parseExpression(precedence: PrecedenceOrder) {
