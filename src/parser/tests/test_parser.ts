@@ -14,10 +14,10 @@ import {
 describe('parser', function () {
     it('let', function () {
         let input = `
-   let x = 5;
-   let y = 10;
-   let foobar = 838383;
-   `
+let x = 5;
+let y = 10;
+let foobar = 838383;
+`
         let lexer = new Lexer(input)
         let parser = new Parser(lexer)
 
@@ -30,7 +30,7 @@ describe('parser', function () {
         let i = 0
         for (let statement of program.statements) {
             expect(statement instanceof LetStatement).toBe(true)
-            if(!(statement instanceof LetStatement)) throw 'bad statement'
+            if (!(statement instanceof LetStatement)) throw 'bad statement'
             expect(statement.name.value).toBe(names[i])
             expect(statement.string()).toBe(strings[i])
 
@@ -40,10 +40,10 @@ describe('parser', function () {
 
     it('return', function () {
         let input = `
-   return 5;
-   return 10;
-   return 838383;
-   `
+return 5;
+return 10;
+return 838383;
+`
         let lexer = new Lexer(input)
         let parser = new Parser(lexer)
 
@@ -55,7 +55,7 @@ describe('parser', function () {
         let i = 0
         for (let statement of program.statements) {
             expect(statement instanceof ReturnStatement).toBe(true)
-            if(!(statement instanceof ReturnStatement)) throw 'bad statement'
+            if (!(statement instanceof ReturnStatement)) throw 'bad statement'
             expect(statement.string()).toBe(strings[i])
 
             i++
@@ -64,8 +64,8 @@ describe('parser', function () {
 
     it('identifier', function () {
         let input = `
-        foobar;
-   `
+foobar;
+`
         let lexer = new Lexer(input)
         let parser = new Parser(lexer)
 
@@ -73,15 +73,15 @@ describe('parser', function () {
 
         expect(program.statements.length).toBe(1)
         let statement = program.statements[0]
-        if(!(statement instanceof ExpressionStatement)) throw 'bad statement'
-        if(!(statement.expression instanceof Identifier)) throw 'bad expression'
+        if (!(statement instanceof ExpressionStatement)) throw 'bad statement'
+        if (!(statement.expression instanceof Identifier)) throw 'bad expression'
         expect(statement.expression.value).toBe('foobar')
     });
 
     it('int literal', function () {
         let input = `
-        1;
-   `
+    1;
+`
         let lexer = new Lexer(input)
         let parser = new Parser(lexer)
 
@@ -89,16 +89,16 @@ describe('parser', function () {
 
         expect(program.statements.length).toBe(1)
         let statement = program.statements[0]
-        if(!(statement instanceof ExpressionStatement)) throw 'bad statement'
-        if(!(statement.expression instanceof IntLiteral)) throw 'bad expression'
+        if (!(statement instanceof ExpressionStatement)) throw 'bad statement'
+        if (!(statement.expression instanceof IntLiteral)) throw 'bad expression'
         expect(statement.expression.value).toBe(1)
     });
 
     it('prefix', function () {
         let input = `
-        -1;
-        !2;
-   `
+-1;
+!2;
+`
         let lexer = new Lexer(input)
         let parser = new Parser(lexer)
 
@@ -111,10 +111,10 @@ describe('parser', function () {
         let rights = ['1', '2']
         for (let statement of program.statements) {
             expect(statement).toBeInstanceOf(ExpressionStatement)
-            if(!(statement instanceof ExpressionStatement)) throw 'bad statement'
+            if (!(statement instanceof ExpressionStatement)) throw 'bad statement'
             let expression = statement.expression
             expect(expression).toBeInstanceOf(PrefixExpression)
-            if(!(expression instanceof PrefixExpression)) throw 'bad statement'
+            if (!(expression instanceof PrefixExpression)) throw 'bad statement'
             expect(expression.operator).toBe(operators[i])
             expect(expression.right?.string()).toBe(rights[i])
             expect(expression.right).toBeInstanceOf(types[i])
@@ -133,7 +133,7 @@ describe('parser', function () {
 5 < 5;
 5 == 5;
 5 != 5;
-   `
+`
         let lexer = new Lexer(input)
         let parser = new Parser(lexer)
 
@@ -146,10 +146,10 @@ describe('parser', function () {
         let rights = ['5', '5', '5', '5', '5', '5', '5', '5',]
         for (let statement of program.statements) {
             expect(statement).toBeInstanceOf(ExpressionStatement)
-            if(!(statement instanceof ExpressionStatement)) throw 'bad statement'
+            if (!(statement instanceof ExpressionStatement)) throw 'bad statement'
             let expression = statement.expression
             expect(expression).toBeInstanceOf(InfixExpression)
-            if(!(expression instanceof InfixExpression)) throw 'bad statement'
+            if (!(expression instanceof InfixExpression)) throw 'bad statement'
             expect(expression.left?.string()).toBe(lefts[i])
             expect(expression.operator).toBe(operators[i])
             expect(expression.right?.string()).toBe(rights[i])
@@ -160,11 +160,11 @@ describe('parser', function () {
 
     it('boolean', function () {
         let input = `
-        true;
-        false;
-        let foobar = true;
-        let barfoo = false;
-   `
+true;
+false;
+let foobar = true;
+let barfoo = false;
+`
         let lexer = new Lexer(input)
         let parser = new Parser(lexer)
 
