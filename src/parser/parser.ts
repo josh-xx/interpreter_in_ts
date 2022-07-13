@@ -3,6 +3,7 @@ import {Token, TokenType} from "../token/token";
 import {
     BlockStatement,
     BooleanLiteral,
+    CallExpression,
     Expression,
     ExpressionStatement,
     FunctionLiteral,
@@ -26,6 +27,7 @@ export enum PrecedenceOrder {
     Sum,
     Product,
     Prefix,
+    Call,
 }
 
 export const PrecedenceMap: Partial<Record<TokenType, PrecedenceOrder>> = {
@@ -37,6 +39,7 @@ export const PrecedenceMap: Partial<Record<TokenType, PrecedenceOrder>> = {
     [TokenType.Minus]: PrecedenceOrder.Sum,
     [TokenType.Asterisk]: PrecedenceOrder.Product,
     [TokenType.Slash]: PrecedenceOrder.Product,
+    [TokenType.L_Paren]: PrecedenceOrder.Call,
 }
 
 export class Parser {
@@ -74,6 +77,7 @@ export class Parser {
         this.addInfixFn(TokenType.Not_Eq, this.parseInfixExpression)
         this.addInfixFn(TokenType.LessThan, this.parseInfixExpression)
         this.addInfixFn(TokenType.GreaterThan, this.parseInfixExpression)
+        this.addInfixFn(TokenType.L_Paren, this.parseCallExpression)
     }
 
     parseInfixExpression = (left: Expression) => {
@@ -220,6 +224,31 @@ export class Parser {
         }
 
         return identifiers
+    }
+
+    parseCallExpression = (callee: Expression) => {
+        return new CallExpression(this.currentToken, callee, this.parseCallArguments())
+    }
+
+    parseCallArguments() {
+        let args: Expression[] = []
+        // empty
+        if (this.peekTokenIs(TokenType.R_Paren)) {
+            this.nextToken()
+            return args
+        }
+        this.nextToken()
+        args.push(this.parseExpression(PrecedenceOrder.Lowest))
+        while (this.peekTokenIs(TokenType.Comma)) {
+            this.nextToken() // ,
+            this.nextToken() // expression start
+            args.push(this.parseExpression(PrecedenceOrder.Lowest))
+        }
+        if (!this.nextTokenIfPeekIs(TokenType.R_Paren)) {
+            throw 'argument no closing paren'
+        }
+
+        return args
     }
 
     parseFunctionLiteral = () => {

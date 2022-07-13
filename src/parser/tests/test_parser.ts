@@ -327,4 +327,32 @@ fn(x, y, z) {};
         expect(statements[2].expression.string()).toBe('fn (x, y, z) {  }')
     });
 
+    it('call', function () {
+        let inputs = [
+            [
+                "a + add(b * c) + d",
+                "((a + add((b * c))) + d)",
+            ],
+            [
+                "add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))",
+                "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))",
+            ],
+            [
+                "add(a + b + c * d / f + g)",
+                "add((((a + b) + ((c * d) / f)) + g))",
+            ]
+        ]
+
+        for (let input of inputs) {
+            let [test, result] = input
+            let lexer = new Lexer(test)
+            let parser = new Parser(lexer)
+
+            let statements = parser.parseProgram().statements
+
+            expect(statements.length).toBe(1)
+            expect(statements[0].string()).toBe(result)
+        }
+    });
+
 });

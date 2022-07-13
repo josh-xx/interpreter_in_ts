@@ -178,3 +178,19 @@ export class FunctionLiteral implements Expression {
         return `fn (${this.parameters.map(p => p.string()).join(', ')}) ${this.body.string()}`
     }
 }
+
+export class CallExpression implements Expression {
+    constructor(
+        public token: Token,
+        public callee: Expression,
+        public argumentList: Expression[],
+    ) {}
+
+    tokenLiteral(): string {
+        return this.token.literal
+    }
+
+    string(): string {
+        return `${this.callee.string()}(${this.argumentList.map(a => a.string()).join(', ')})`
+    }
+}
