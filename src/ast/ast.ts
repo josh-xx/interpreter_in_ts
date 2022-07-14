@@ -1,6 +1,6 @@
 import {Token, TokenType} from "../token/token";
 
-interface AstNode {
+export interface AstNode {
     tokenLiteral(): string
     string(): string
 }
@@ -11,10 +11,18 @@ export interface Statement extends AstNode {
 export interface Expression extends AstNode {
 }
 
-export class Program {
+export class Program implements AstNode {
     constructor(
         public statements: Statement[] = []
     ) {}
+
+    tokenLiteral(): string {
+        return 'program'
+    }
+
+    string(): string {
+        return this.statements.map(s => s.string()).join('\n')
+    }
 }
 
 export class Identifier implements Expression {
