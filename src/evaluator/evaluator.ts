@@ -60,6 +60,24 @@ export const evalIntegerInfixExpression = (operator: string, left: ObjectInteger
         return new ObjectInteger(left.value * right.value)
     } else if (operator === '/') {
         return new ObjectInteger(left.value / right.value)
+    } else if (operator === '<') {
+        return new ObjectBoolean(left.value < right.value)
+    } else if (operator === '>') {
+        return new ObjectBoolean(left.value > right.value)
+    } else if (operator === '==') {
+        return new ObjectBoolean(left.value == right.value)
+    } else if (operator === '!=') {
+        return new ObjectBoolean(left.value != right.value)
+    } else {
+        throw `unsupported operator ${operator}`
+    }
+}
+
+export const evalBooleanInfixExpression = (operator: string, left: ObjectBoolean, right: ObjectBoolean) => {
+    if (operator === '==') {
+        return new ObjectBoolean(left.value == right.value)
+    } else if (operator === '!=') {
+        return new ObjectBoolean(left.value != right.value)
     } else {
         throw `unsupported operator ${operator}`
     }
@@ -68,6 +86,8 @@ export const evalIntegerInfixExpression = (operator: string, left: ObjectInteger
 export const evalInfixExpression = (operator: string, left: ObjectBase, right: ObjectBase) => {
     if (left instanceof ObjectInteger && right instanceof ObjectInteger) {
         return evalIntegerInfixExpression(operator, left, right)
+    } else if (left instanceof ObjectBoolean && right instanceof ObjectBoolean) {
+        return evalBooleanInfixExpression(operator, left, right)
     } else {
         throw 'unsupported infix'
     }
