@@ -13,15 +13,22 @@ describe('evaluator', function () {
     }
 
     const testObjectInteger = (obj: ObjectBase, expected: number) => {
-        if (!(obj instanceof ObjectInteger)) throw 'bad statement'
         expect(obj).toBeInstanceOf(ObjectInteger)
+        if (!(obj instanceof ObjectInteger)) throw 'bad statement'
 
         expect(obj.value).toBe(expected)
     }
 
     const testObjectBoolean = (obj: ObjectBase, expected: boolean) => {
-        if (!(obj instanceof ObjectBoolean)) throw 'bad statement'
         expect(obj).toBeInstanceOf(ObjectBoolean)
+        if (!(obj instanceof ObjectBoolean)) throw 'bad statement'
+
+        expect(obj.value).toBe(expected)
+    }
+
+    const testBangOperator = (obj: ObjectBase, expected: boolean) => {
+        expect(obj).toBeInstanceOf(ObjectBoolean)
+        if (!(obj instanceof ObjectBoolean)) throw 'bad statement'
 
         expect(obj.value).toBe(expected)
     }
@@ -52,6 +59,22 @@ describe('evaluator', function () {
 
     it('null', function () {
         expect(testEval('null')).toBeInstanceOf(ObjectNull)
+    });
+
+    it('bang', function () {
+        let tests: [string, boolean][] = [
+            ["!true", false],
+            ["!false", true],
+            ["!5", false],
+            ["!!true", true],
+            ["!!false", false],
+            ["!!5", true],
+        ]
+        for (let test of tests) {
+            let [input, expected] = test
+            let e = testEval(input)
+            testBangOperator(e, expected)
+        }
     });
 
 });
