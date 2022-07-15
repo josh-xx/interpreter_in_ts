@@ -107,4 +107,26 @@ describe('evaluator', function () {
         }
     });
 
+    it('if', function () {
+        let tests: [string, any][] = [
+            ["if (true) { 10 }", 10],
+            ["if (false) { 10 }", null],
+            ["if (1) { 10 }", 10],
+            ["if (1 < 2) { 10 }", 10],
+            ["if (1 > 2) { 10 }", null],
+            ["if (1 > 2) { 10 } else { 20 }", 20],
+            ["if (1 < 2) { 10 } else { 20 }", 10],
+        ]
+        for (let test of tests) {
+            let [input, expected] = test
+            let e = testEval(input)
+
+            if (e instanceof ObjectInteger) {
+                testObjectInteger(e, expected)
+            } else if (e instanceof ObjectNull) {
+                expect(expected).toBe(null)
+            }
+        }
+    });
+
 });

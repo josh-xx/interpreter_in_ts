@@ -1,9 +1,11 @@
 import {
     AstNode,
+    BlockStatement,
     BooleanLiteral,
     Expression,
     ExpressionStatement,
     Identifier,
+    IfExpression,
     InfixExpression,
     IntLiteral,
     PrefixExpression,
@@ -93,6 +95,29 @@ export const evalInfixExpression = (operator: string, left: ObjectBase, right: O
     }
 }
 
+export const evalIfExpression = (expression: IfExpression) => {
+    let condition = evaluate(expression.condition)
+
+    let isTruthy = false
+    if (condition instanceof ObjectInteger) {
+        isTruthy = Boolean(condition.value)
+    } else if (condition instanceof ObjectBoolean) {
+        isTruthy = condition.value
+    } else if (condition instanceof ObjectNull) {
+        isTruthy = false
+    }
+
+    if (isTruthy) {
+        return evaluate(expression.consequences)
+    } else {
+        if (expression.alternatives) {
+            return evaluate(expression.alternatives)
+        } else {
+            return new ObjectNull()
+        }
+    }
+}
+
 export const evaluate = (node: AstNode): ObjectBase => {
     if (node instanceof Program) {
         return evalStatements(node.statements)
@@ -114,9 +139,16 @@ export const evaluate = (node: AstNode): ObjectBase => {
         let left = evaluate(node.left)
 
         return evalInfixExpression(node.operator, left, right)
+    } else if (node instanceof IfExpression) {
+        return evalIfExpression(node)
+    } else if (node instanceof BlockStatement) {
+        let ss = []
+        for (let s of node.statements) {
+            if (s !== null) ss.push(s)
+        }
+        return evalStatements(ss)
     } else if (node instanceof Identifier && node.value === 'null') {
         return new ObjectNull()
     }
-    console.log(node)
     return new ObjectInteger(1)
 }
