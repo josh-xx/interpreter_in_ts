@@ -29,3 +29,13 @@ export class ObjectNull implements ObjectBase {
         return null
     }
 }
+
+export class ObjectReturnValue implements ObjectBase {
+    constructor(
+        public value: ObjectBase,
+    ) {}
+
+    inspect() {
+        return this.value
+    }
+}

@@ -10,14 +10,23 @@ import {
     IntLiteral,
     PrefixExpression,
     Program,
+    ReturnStatement,
     Statement
 } from "../ast/ast";
-import {ObjectBase, ObjectBoolean, ObjectInteger, ObjectNull} from "../object/object";
+import {ObjectBase, ObjectBoolean, ObjectInteger, ObjectNull, ObjectReturnValue} from "../object/object";
 
-export const evalStatements = (statements: Statement[]) => {
+export const evalProgram = (program: Program) => {
+    let statements = program.statements
+
     let result: ObjectBase = evaluate(statements[0])
+    if (result instanceof ObjectReturnValue) {
+        return result.value
+    }
     for (const statement of statements.slice(1)) {
         result = evaluate(statement)
+        if (result instanceof ObjectReturnValue) {
+            return result.value
+        }
     }
 
     return result
@@ -118,9 +127,34 @@ export const evalIfExpression = (expression: IfExpression) => {
     }
 }
 
+export const evalBlockStatement = (block: BlockStatement) => {
+    let statements = block.statements
+
+    let ss = []
+    for (let s of statements) {
+        if (s !== null) ss.push(s)
+    }
+
+    let result: ObjectBase = evaluate(ss[0])
+    if (result instanceof ObjectReturnValue) {
+        return result
+    }
+
+    for (let statement of ss.slice(1)) {
+        if (statement === null) continue
+
+        result = evaluate(statement)
+        if (result instanceof ObjectReturnValue) {
+            return result
+        }
+    }
+
+    return result
+}
+
 export const evaluate = (node: AstNode): ObjectBase => {
     if (node instanceof Program) {
-        return evalStatements(node.statements)
+        return evalProgram(node)
     } else if (node instanceof ExpressionStatement) {
         return evaluate(node.expression)
     } else if (node instanceof IntLiteral) {
@@ -142,13 +176,13 @@ export const evaluate = (node: AstNode): ObjectBase => {
     } else if (node instanceof IfExpression) {
         return evalIfExpression(node)
     } else if (node instanceof BlockStatement) {
-        let ss = []
-        for (let s of node.statements) {
-            if (s !== null) ss.push(s)
-        }
-        return evalStatements(ss)
+        return evalBlockStatement(node)
     } else if (node instanceof Identifier && node.value === 'null') {
         return new ObjectNull()
+    } else if (node instanceof ReturnStatement) {
+        if (node.value === null) throw 'bad return statement'
+        let v = evaluate(node.value)
+        return new ObjectReturnValue(v)
     }
     return new ObjectInteger(1)
 }
