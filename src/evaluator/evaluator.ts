@@ -4,6 +4,7 @@ import {
     Expression,
     ExpressionStatement,
     Identifier,
+    InfixExpression,
     IntLiteral,
     PrefixExpression,
     Program,
@@ -32,13 +33,43 @@ export const evalBangOperatorExpression = (right: ObjectBase) => {
     }
 }
 
-export const evalPrefixExpression = (operator: string, right: ObjectBase) => {
-    if (right === null) throw 'bad right expression'
+export const evalMinusPrefixOperatorExpression = (right: ObjectBase) => {
+    if (right instanceof ObjectInteger) {
+        return new ObjectInteger(-right.value)
+    } else {
+        throw `bad right evaluated`
+    }
+}
 
+export const evalPrefixExpression = (operator: string, right: ObjectBase) => {
     if (operator === '!') {
         return evalBangOperatorExpression(right)
+    } else if (operator === '-') {
+        return evalMinusPrefixOperatorExpression(right)
     } else {
         throw `unsupported operator ${operator}`
+    }
+}
+
+export const evalIntegerInfixExpression = (operator: string, left: ObjectInteger, right: ObjectInteger) => {
+    if (operator === '+') {
+        return new ObjectInteger(left.value + right.value)
+    } else if (operator === '-') {
+        return new ObjectInteger(left.value - right.value)
+    } else if (operator === '*') {
+        return new ObjectInteger(left.value * right.value)
+    } else if (operator === '/') {
+        return new ObjectInteger(left.value / right.value)
+    } else {
+        throw `unsupported operator ${operator}`
+    }
+}
+
+export const evalInfixExpression = (operator: string, left: ObjectBase, right: ObjectBase) => {
+    if (left instanceof ObjectInteger && right instanceof ObjectInteger) {
+        return evalIntegerInfixExpression(operator, left, right)
+    } else {
+        throw 'unsupported infix'
     }
 }
 
@@ -55,6 +86,14 @@ export const evaluate = (node: AstNode): ObjectBase => {
         if (node.right === null) throw `bad expression`
         let right = evaluate(node.right)
         return evalPrefixExpression(node.operator, right)
+    } else if (node instanceof InfixExpression) {
+        if (node.right === null) throw `bad expression`
+        if (node.left === null) throw `bad expression`
+
+        let right = evaluate(node.right)
+        let left = evaluate(node.left)
+
+        return evalInfixExpression(node.operator, left, right)
     } else if (node instanceof Identifier && node.value === 'null') {
         return new ObjectNull()
     }
